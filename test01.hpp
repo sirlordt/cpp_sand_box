@@ -9,15 +9,20 @@ namespace Test01
 
 struct Address {
 
+  char *name = nullptr; 
   char *street = nullptr;
   char *zip_code = nullptr;
   char *county = nullptr;
   char *state = nullptr;
   char *country = nullptr;
 
-  explicit Address( const char *street, const char *zip_code, const char *county, const char *state, const char *country ) {
+  explicit Address( const char *name, const char *street, const char *zip_code, const char *county, const char *state, const char *country ) {
 
-    int size = strlen( street );
+    int size = strlen( name );
+    this->name = new char[ size + 1 ];
+    strcpy( this->name, name );
+
+    size = strlen( street );
     this->street = new char[ size + 1 ];
     strcpy( this->street, street );
 
@@ -43,57 +48,70 @@ struct Address {
 
     //address->country = nullptr;
 
-    int size = strlen( address->street );
+    int size = strlen( address->name );
+    this->name = new char[ size + 1 ];
+    strcpy( this->name, address->name );
+
+    size = strlen( address->street );
     this->street = new char[ size + 1 ];
-    strcpy( this->street, street );
+    strcpy( this->street, address->street );
 
     size = strlen( address->zip_code );
     this->zip_code = new char[ size + 1 ];
-    strcpy( this->zip_code, zip_code );
+    strcpy( this->zip_code, address->zip_code );
 
     size = strlen( address->county );
     this->county = new char[ size + 1 ];
-    strcpy( this->county, county );
+    strcpy( this->county, address->county );
 
     size = strlen( address->state );
     this->state = new char[ size + 1 ];
-    strcpy( this->state, state );
+    strcpy( this->state, address->state );
 
     size = strlen( address->country );
     this->country = new char[ size + 1 ];
-    strcpy( this->country, country );
+    strcpy( this->country, address->country );
   
   }
 
   explicit Address( const Address &address ) {
 
     //address->country = nullptr;
+    int size = strlen( address.name );
+    this->name = new char[ size + 1 ];
+    strcpy( this->name, address.name );
 
-    int size = strlen( address.street );
+    size = strlen( address.street );
     this->street = new char[ size + 1 ];
-    strcpy( this->street, street );
+    strcpy( this->street, address.street );
 
     size = strlen( address.zip_code );
     this->zip_code = new char[ size + 1 ];
-    strcpy( this->zip_code, zip_code );
+    strcpy( this->zip_code, address.zip_code );
 
     size = strlen( address.county );
     this->county = new char[ size + 1 ];
-    strcpy( this->county, county );
+    strcpy( this->county, address.county );
 
     size = strlen( address.state );
     this->state = new char[ size + 1 ];
-    strcpy( this->state, state );
+    strcpy( this->state, address.state );
 
     size = strlen( address.country );
     this->country = new char[ size + 1 ];
-    strcpy( this->country, country );
+    strcpy( this->country, address.country );
 
   }
 
   ~Address() {
 
-    //std::cout << "Address::~Address" << std::endl;
+    std::cout << "Address::~Address Name: " << name << std::endl;
+
+    if ( name ) {
+
+      delete[] name;
+
+    }
 
     if ( street ) {
 
@@ -124,6 +142,26 @@ struct Address {
       delete[] country;
 
     }    
+
+  }
+
+  void set_name( const char *name ) {
+
+    if ( this->name ) {
+
+      delete[] this->name;
+
+    }
+
+    int size = strlen( name );
+    this->name = new char[ size + 1 ];
+    strcpy( this->name, name );
+
+  }
+
+  const char *get_name() {
+
+    return this->name;
 
   }
 
@@ -164,7 +202,7 @@ struct Person
 
   ~Person() {
 
-    //std::cout << "Person::~Person" << std::endl;
+    std::cout << "Person::~Person first_name: " << first_name << std::endl;
 
     if ( id ) {
 
