@@ -4,12 +4,12 @@
 #include <string>
 #include <array>
 
-namespace Test01 
+namespace Test01
 {
 
 struct Address {
 
-  char *name = nullptr; 
+  char *name = nullptr;
   char *street = nullptr;
   char *zip_code = nullptr;
   char *county = nullptr;
@@ -71,7 +71,7 @@ struct Address {
     size = strlen( address->country );
     this->country = new char[ size + 1 ];
     strcpy( this->country, address->country );
-  
+
   }
 
   explicit Address( const Address &address ) {
@@ -120,28 +120,28 @@ struct Address {
     }
 
     if ( zip_code ) {
-      
+
       delete[] zip_code;
 
     }
 
     if ( county ) {
-    
+
       delete[] county;
 
     }
 
     if ( state ) {
-    
+
       delete[] state;
 
-    }    
+    }
 
     if ( country ) {
-    
+
       delete[] country;
 
-    }    
+    }
 
   }
 
@@ -174,7 +174,7 @@ struct Person
   char *first_name = nullptr;
   char *last_name = nullptr;
   int age = 0;
-  const Address *address = nullptr; 
+  const Address *address = nullptr;
 
   explicit Person( const char *id, const char *first_name, const char *last_name, const int age, const Address *address ) {
 
@@ -194,7 +194,11 @@ struct Person
 
     //address->country = nullptr;
 
-    this->address = new Address( address );
+    if ( address ) {
+
+      this->address = new Address( *address );
+
+    }
 
     //this->address->country = nullptr;
 
@@ -211,13 +215,13 @@ struct Person
     }
 
     if ( first_name ) {
-      
+
       delete[] first_name;
 
     }
 
     if ( last_name ) {
-    
+
       delete[] last_name;
 
     }
@@ -228,7 +232,7 @@ struct Person
 
     }
 
-    age = 0; 
+    age = 0;
 
   }
 

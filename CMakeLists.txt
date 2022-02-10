@@ -4,10 +4,32 @@ project(main)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+#Clang++ require the next line to debug std::string
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG")
+
+# add_executable(main
+#  test01.hpp
+#  Vector.hpp
+#  SystemUtilities.hpp
+#  CallStackFrame.hpp
+#  main.cpp
+# )
 
 add_executable(main
-  test01.hpp
-  main.cpp
+  main6.cpp
+  Vector.hpp
 )
 
+# add_executable(main
+#   Vector.hpp
+#   SystemUtilities.hpp
+#   main5.cpp
+# )
+
+#target_link_options(main PRIVATE --static -static-libgcc -static-libstdc++)
+
+#dw bfd dwarf elf
 target_link_libraries(main PRIVATE rt dl m pthread)
+#target_link_libraries(main PRIVATE dw unwind supc++)
+#target_link_libraries(main PRIVATE dw unwind supc++)
+

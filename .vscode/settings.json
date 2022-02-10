@@ -69,6 +69,7 @@
         "cerrno": "cpp",
         "csetjmp": "cpp",
         "csignal": "cpp",
-        "syncstream": "cpp"
+        "syncstream": "cpp",
+        "fstream": "cpp"
     }
 }
