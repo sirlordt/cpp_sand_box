@@ -15,16 +15,28 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG")
 #  main.cpp
 # )
 
-add_executable(main
-  main6.cpp
-  Vector.hpp
-)
-
 # add_executable(main
 #   Vector.hpp
 #   SystemUtilities.hpp
 #   main5.cpp
 # )
+
+# add_executable(main
+#   main6.cpp
+#   Vector.hpp
+# )
+
+# add_executable(main
+#   main7.cpp
+#   Vector.hpp
+#   String.hpp
+# )
+
+add_executable(main
+  main12_Allocator.cpp
+  CallStackFrame.hpp
+  CommonUtilities.hpp
+)
 
 #target_link_options(main PRIVATE --static -static-libgcc -static-libstdc++)
 

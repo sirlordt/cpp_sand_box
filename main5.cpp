@@ -19,25 +19,25 @@ struct Exception
   std::string code;
   std::string message;
   std::string at;
-  KISS::Vector<KISS::CallStackFrame> call_stack;
+  NSTD::Vector<NSTD::CallStackFrame> call_stack;
 
 };
 
-static std::map<std::string, KISS::Vector<KISS::CallStackFrame>> global_thread_call_stack;
+static std::map<std::string, NSTD::Vector<NSTD::CallStackFrame>> global_thread_call_stack;
 
 
 int main(int argc, char *argv[])
 {
 
-  KISS::CallStackFrame x1 = { "1", "2", "3" };
+  NSTD::CallStackFrame x1 = { "1", "2", "3" };
 
   std::cout << "x1 => " << std::endl << x1 << std::endl;
 
-  KISS::CallStackFrame y1 = { x1 };
+  NSTD::CallStackFrame y1 = { x1 };
 
   std::cout << "y1 => " << std::endl << y1 << std::endl;
 
-  KISS::CallStackFrame z1 = std::move( y1 );
+  NSTD::CallStackFrame z1 = std::move( y1 );
   std::cout << "y1 => " << std::endl << y1 << std::endl;
   std::cout << "z1 => " << std::endl << z1 << std::endl;
 

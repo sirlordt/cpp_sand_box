@@ -14,12 +14,12 @@
 #define __DEBUG__     true
 #define __DEBUG_OUT__ std::cout
 
-std::map<std::string, KISS::Vector<KISS::CallStackFrame>> global_thread_call_stack; // { {}, {} };
+std::map<std::string, NSTD::Vector<NSTD::CallStackFrame>> global_thread_call_stack; // { {}, {} };
 
-const KISS::CallStackFrame test_return_01()
+const NSTD::CallStackFrame test_return_01()
 {
 
-  const KISS::CallStackFrame result = { "1", "2", "3" };
+  const NSTD::CallStackFrame result = { "1", "2", "3" };
 
   //result = { "1", "2", "3" };
 
@@ -28,29 +28,29 @@ const KISS::CallStackFrame test_return_01()
 
 }
 
-KISS::Vector<KISS::CallStackFrame> test_return_02()
+NSTD::Vector<NSTD::CallStackFrame> test_return_02()
 {
 
-  KISS::Vector<KISS::CallStackFrame> result;
+  NSTD::Vector<NSTD::CallStackFrame> result;
 
   result.reserve( 2 );
 
-  result.push_back( KISS::CallStackFrame( "1", "2", "3" ) );
-  result.push_back( KISS::CallStackFrame( "4", "5", "6" ) );
+  result.push_back( NSTD::CallStackFrame( "1", "2", "3" ) );
+  result.push_back( NSTD::CallStackFrame( "4", "5", "6" ) );
   //result.emplace_back( KISS::CallStackFrame( "1", "2", "3" ) );
 
   return result;
 
 }
 
-std::vector<KISS::CallStackFrame> test_return_03()
+std::vector<NSTD::CallStackFrame> test_return_03()
 {
 
-  std::vector<KISS::CallStackFrame> result;
+  std::vector<NSTD::CallStackFrame> result;
 
   result.reserve( 2 );
 
-  result.push_back( std::move( KISS::CallStackFrame( "1", "2", "3" ) ) );
+  result.push_back( std::move( NSTD::CallStackFrame( "1", "2", "3" ) ) );
   //result.push_back( std::move( KISS::CallStackFrame( "4", "5", "6" ) ) );
   //result.emplace_back( KISS::CallStackFrame( "1", "2", "3" ) );
 
@@ -77,10 +77,10 @@ int main(int argc, char *argv[])
   // __DEBUG_OUT__ << "*******************" << std::endl;
   // __DEBUG_OUT__ << std::endl;
 
-  KISS::Vector<KISS::CallStackFrame> test_02 = test_return_02();
+  NSTD::Vector<NSTD::CallStackFrame> test_02 = test_return_02();
   //std::vector<KISS::CallStackFrame> test_02 = test_return_03();
 
-  for ( const KISS::CallStackFrame& call_stack_frame: test_02 ) {
+  for ( const NSTD::CallStackFrame& call_stack_frame: test_02 ) {
 
     __DEBUG_OUT__ << call_stack_frame;
 
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
   global_thread_call_stack[ "1111" ] = std::move( test_02 ); //Move the elements
   //global_thread_call_stack[ "1111" ] = test_02; //Copy all elements
 
-  for ( const KISS::CallStackFrame& call_stack_frame: global_thread_call_stack[ "1111" ] ) {
+  for ( const NSTD::CallStackFrame& call_stack_frame: global_thread_call_stack[ "1111" ] ) {
 
     __DEBUG_OUT__ << call_stack_frame;
 

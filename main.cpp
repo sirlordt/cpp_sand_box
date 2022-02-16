@@ -50,24 +50,24 @@ struct Exception
   std::string code;
   std::string message;
   std::string at;
-  KISS::Vector<KISS::CallStackFrame> *call_stack;
+  NSTD::Vector<NSTD::CallStackFrame> call_stack;
 
 };
 
-static std::map<std::string, std::stack<__jmp_buf_tag>> global_jump_buffer;
+static std::map< std::string, std::stack<__jmp_buf_tag> > global_jump_buffer;
 static std::mutex global_jump_mutex;
-static std::map<std::string, std::string> global_thread_name;
+static std::map< std::string, std::string > global_thread_name;
 static std::mutex global_thread_mutex;
 //static std::map<std::string, KISS::Vector<KISS::CallStackFrame>> global_thread_call_stack;
-static std::map<std::string, KISS::Vector<KISS::CallStackFrame> *> global_thread_call_stack;
+static std::map< std::string, NSTD::Vector<NSTD::CallStackFrame> > global_thread_call_stack;
 
 static const char * global_program_name;
 
-inline const KISS::CallStackFrame parse_addr2Line_out( std::string addr2line_out,
+inline const NSTD::CallStackFrame parse_addr2Line_out( std::string addr2line_out,
                                                        std::string symbol_file,
                                                        std::string symbol_offset ) noexcept {
 
-  KISS::CallStackFrame result;
+  NSTD::CallStackFrame result;
 
   int index_at = addr2line_out.find( " at " );
 
@@ -158,10 +158,10 @@ inline const KISS::CallStackFrame parse_addr2Line_out( std::string addr2line_out
 
 #define MAX_STACK_FRAMES 64
 
-KISS::Vector<KISS::CallStackFrame>* get_call_stack_entries( int stack_offset )
+NSTD::Vector<NSTD::CallStackFrame> get_call_stack_entries( int stack_offset )
 {
 
-  KISS::Vector<KISS::CallStackFrame> *result = new KISS::Vector<KISS::CallStackFrame>();
+  NSTD::Vector<NSTD::CallStackFrame> result; // = new NSTD::Vector<NSTD::CallStackFrame>();
 
   void *memory_stack_frames[ MAX_STACK_FRAMES ];
 
@@ -171,7 +171,7 @@ KISS::Vector<KISS::CallStackFrame>* get_call_stack_entries( int stack_offset )
   trace_size = backtrace( memory_stack_frames, MAX_STACK_FRAMES ); //get the void pointers for all of the entries. MEMORY RAM ADDRESS ONLY!!!
   messages = backtrace_symbols( memory_stack_frames, trace_size ); //Get stack trace relative to current symbols in file disk (function symbols)
 
-  result->reserve( trace_size );
+  result.reserve( trace_size );
 
   for ( int trace_index = stack_offset; trace_index < trace_size; ++trace_index )
   {
@@ -240,11 +240,11 @@ KISS::Vector<KISS::CallStackFrame>* get_call_stack_entries( int stack_offset )
 
         const std::string addr2line_out = CommonUtilities::addr_to_line( symbol_file.c_str(), symbol_offset.c_str() );
 
-        const KISS::CallStackFrame call_stack_entry = parse_addr2Line_out( addr2line_out,
+        const NSTD::CallStackFrame call_stack_entry = parse_addr2Line_out( addr2line_out,
                                                                            symbol_file,
                                                                            symbol_offset );
 
-        result->push_back( call_stack_entry );
+        result.push_back( call_stack_entry );
 
         //std::cout << call_stack_entry.function << " => " << call_stack_entry.file << ":" << call_stack_entry.line << std::endl;
 
@@ -273,64 +273,6 @@ KISS::Vector<KISS::CallStackFrame>* get_call_stack_entries( int stack_offset )
 
         result.push_back( call_stack_entry );
 
-        // const int index_at = addr2line_out.find( " at " );
-
-        // std::string mangled_symbol_name = addr2line_out.substr( 0, index_at );
-
-        // const int end_line = addr2line_out.find( "\n" );
-
-        // std::string symbol_source_location = addr2line_out.substr( index_at + 4, end_line - ( index_at + 4 ) );
-
-        // const int semicolon = symbol_source_location.find( ":" );
-
-        // std::string source_file = symbol_source_location.substr( 0, semicolon );
-
-        // if ( source_file == "??" )
-        // {
-
-        //   source_file = symbol_file;
-
-        // }
-
-        // std::string source_line = symbol_source_location.substr( semicolon + 1 );
-
-        // if ( source_line == "?" )
-        // {
-
-        //   source_line = symbol_offset;
-
-        // }
-
-        // int status;
-        // char* demangled_symbol_name = abi::__cxa_demangle(mangled_symbol_name.c_str(), nullptr, nullptr, &status );
-
-        // std::string demangled_symbol_name_str; // = { demangled_symbol_name_str };
-
-        // if ( demangled_symbol_name )
-        // {
-
-        //   demangled_symbol_name_str = demangled_symbol_name;
-
-        // }
-        // else {
-
-        //   demangled_symbol_name_str = mangled_symbol_name;
-
-        // }
-
-        // CallStackEntry call_stack_entry {
-        //   demangled_symbol_name_str,
-        //   source_file,
-        //   source_line
-        // };
-
-        // //CallStackEntry call_stack_entry;
-
-        // //call_stack_entries.push_back( 10 );
-        // result.push_back( call_stack_entry );
-
-        // free( demangled_symbol_name );
-
       }
 
     #endif
@@ -350,242 +292,8 @@ KISS::Vector<KISS::CallStackFrame>* get_call_stack_entries( int stack_offset )
 
 }
 
-// // https://stackoverflow.com/questions/281818/unmangling-the-result-of-stdtype-infoname
-// std::string demangle(const char* name) {
-//     int status = -4;
-//     std::unique_ptr<char, void(*)(void*)> res {
-//         abi::__cxa_demangle(name, NULL, NULL, &status),
-//         std::free
-//     };
-//     return (status==0) ? res.get() : name ;
-// }
-
-// std::string debug_info(Dwfl* dwfl, void* ip) {
-//     std::string function;
-//     int line = -1;
-//     char const* file;
-//     uintptr_t ip2 = reinterpret_cast<uintptr_t>(ip);
-//     Dwfl_Module* module = dwfl_addrmodule(dwfl, ip2);
-//     char const* name = dwfl_module_addrname(module, ip2);
-//     function = name ? demangle(name) : "<unknown>";
-//     if (Dwfl_Line* dwfl_line = dwfl_module_getsrc(module, ip2)) {
-//         Dwarf_Addr addr;
-//         file = dwfl_lineinfo(dwfl_line, &addr, &line, nullptr, nullptr, nullptr);
-//     }
-//     std::stringstream ss;
-//     ss << ip << ' ' << function;
-//     if (file)
-//         ss << " at " << file << ':' << line;
-//     ss << std::endl;
-//     return ss.str();
-// }
-
-// std::string get_stack_trace() {
-//     // Initialize Dwfl.
-//     Dwfl* dwfl = nullptr;
-//     {
-//         Dwfl_Callbacks callbacks = {};
-//         char* debuginfo_path = nullptr;
-//         callbacks.find_elf = dwfl_linux_proc_find_elf;
-//         callbacks.find_debuginfo = dwfl_standard_find_debuginfo;
-//         callbacks.debuginfo_path = &debuginfo_path;
-//         dwfl = dwfl_begin(&callbacks);
-//         assert(dwfl);
-//         int r;
-//         r = dwfl_linux_proc_report(dwfl, getpid());
-//         assert(!r);
-//         r = dwfl_report_end(dwfl, nullptr, nullptr);
-//         assert(!r);
-//         static_cast<void>(r);
-//     }
-
-//     // Loop over stack frames.
-//     std::stringstream ss;
-//     {
-//         void* stack[512];
-//         int stack_size = ::backtrace(stack, sizeof stack / sizeof *stack);
-//         for (int i = 0; i < stack_size; ++i) {
-//             ss << i << ": ";
-
-//             // Works.
-//             ss << debug_info(dwfl, stack[i]);
-
-// #if 0
-//             // TODO intended to do the same as above, but segfaults,
-//             // so possibly UB In above function that does not blow up by chance?
-//             void *ip = stack[i];
-//             std::string function;
-//             int line = -1;
-//             char const* file;
-//             uintptr_t ip2 = reinterpret_cast<uintptr_t>(ip);
-//             Dwfl_Module* module = dwfl_addrmodule(dwfl, ip2);
-//             char const* name = dwfl_module_addrname(module, ip2);
-//             function = name ? demangle(name) : "<unknown>";
-//             // TODO if I comment out this line it does not blow up anymore.
-//             if (Dwfl_Line* dwfl_line = dwfl_module_getsrc(module, ip2)) {
-//               Dwarf_Addr addr;
-//               file = dwfl_lineinfo(dwfl_line, &addr, &line, nullptr, nullptr, nullptr);
-//             }
-//             ss << ip << ' ' << function;
-//             if (file)
-//                 ss << " at " << file << ':' << line;
-//             ss << std::endl;
-// #endif
-//         }
-//     }
-//     dwfl_end(dwfl);
-//     return ss.str();
-// }
-
-
-// void print_stacktrace() {
-
-//   unsigned int stack_depth = 16;
-
-//   void* callstack[stack_depth];
-//   int frames = backtrace(callstack, stack_depth);
-//   char** strs = backtrace_symbols(callstack, frames);
-//   for(int i=0; i<frames; i++) {
-//     puts(strs[i]);
-//   }
-
-//   free(strs);
-
-// }
-
-// int addr2line(char const * const program_name, void const * const addr)
-// {
-//   char addr2line_cmd[512] = {0};
-
-//   /* have addr2line map the address to the relent line in the code */
-//   #ifdef __APPLE__
-//     /* apple does things differently... */
-//     sprintf(addr2line_cmd,"atos -o %.256s %p", program_name, addr);
-//   #else
-//     sprintf(addr2line_cmd,"addr2line -f -p -e %.256s %p", program_name, addr);
-//   #endif
-
-//   /* This will print a nicely formatted string specifying the
-//      function and source line of the address */
-//   return system(addr2line_cmd);
-// }
-
-// void unwind_print_stack_trace() {
-
-//   unw_cursor_t cursor;
-//   unw_context_t context;
-
-//   // Initialize cursor to current frame for local unwinding.
-//   unw_getcontext(&context);
-//   unw_init_local(&cursor, &context);
-
-//   // Unwind frames one by one, going up the frame stack.
-//   while (unw_step(&cursor) > 0) {
-
-//     unw_word_t offset, pc;
-//     unw_get_reg(&cursor, UNW_REG_IP, &pc);
-//     if (pc == 0) {
-//       break;
-//     }
-//     std::printf("0x%lx:", pc);
-
-//     char sym[256];
-//     if (unw_get_proc_name(&cursor, sym, sizeof(sym), &offset) == 0) {
-
-//       char* nameptr = sym;
-//       int status;
-//       char* demangled = abi::__cxa_demangle(sym, nullptr, nullptr, &status);
-//       if (status == 0) {
-//         nameptr = demangled;
-//       }
-//       std::printf(" (%s+0x%lx)\n", nameptr, offset);
-//       std::free(demangled);
-
-//     }
-//     else {
-
-//       std::printf(" -- error: unable to obtain symbol name for this frame\n");
-
-//     }
-
-//   }
-
-// }
-
-// #define MAX_STACK_FRAMES 64
-
-// static void *stack_traces[MAX_STACK_FRAMES];
-
-// void posix_print_stack_trace()
-// {
-//   int i, trace_size = 0;
-//   char **messages = (char **)NULL;
-
-//   trace_size = backtrace(stack_traces, MAX_STACK_FRAMES);
-//   messages = backtrace_symbols(stack_traces, trace_size);
-
-//   /* skip the first couple stack frames (as they are this function and
-//      our handler) and also skip the last frame as it's (always?) junk. */
-//   // for (i = 3; i < (trace_size - 1); ++i)
-//   // we'll use this for now so you can see what's going on
-//   for (i = 0; i < trace_size; ++i)
-//   {
-//     if (addr2line(global_program_name, stack_traces[i]) != 0)
-//     {
-//       printf("  error determining line # for: %s\n", messages[i]);
-//     }
-
-//   }
-
-//   if (messages) { free(messages); }
-
-// }
-
 void catch_signal( int signal, siginfo_t *signalInfo, void *extra )
 {
-
-  // {
-
-  //   ucontext_t *ucontext = (ucontext_t *) extra;
-
-  //   //const int x = ucontext->uc_mcontext.gregs[ REG_RIP ];
-
-  //   backward::StackTrace st;
-  //   void *error_addr = nullptr;
-
-  //   #ifdef REG_RIP // x86_64
-  //     error_addr = reinterpret_cast<void *>( ucontext->uc_mcontext.gregs[REG_RIP] );
-  //   #endif
-
-  //   if ( error_addr )
-  //   {
-
-  //     st.load_from( error_addr,
-  //                   32,
-  //                   reinterpret_cast<void *>( ucontext ),
-  //                   signalInfo->si_addr );
-
-  //   }
-  //   else
-  //   {
-
-  //     st.load_here( 32,
-  //                   reinterpret_cast<void *>( ucontext ),
-  //                   signalInfo->si_addr );
-
-  //   }
-
-  //   std::osyncstream sync_out( std::cout );
-
-  //   sync_out << "cath_signal => Thread: " << global_thread_name[ get_thread_id() ] << " (" << get_thread_id() << ")\n";
-
-  //   backward::Printer printer;
-  //   printer.address = true;
-  //   //printer.
-  //   printer.print( st, sync_out );
-
-  // }
-
 
   // ********** Very Important ************
   // Unblock the signal to allow to OS send again
@@ -607,7 +315,7 @@ void catch_signal( int signal, siginfo_t *signalInfo, void *extra )
 
   {
 
-    KISS::Vector<KISS::CallStackFrame> *call_stack_entries = get_call_stack_entries( 3 );
+    NSTD::Vector<NSTD::CallStackFrame> call_stack_entries = get_call_stack_entries( 3 );
     //KISS::Vector<std::string> *call_stack_entries = new KISS::Vector<std::string>(); // = get_call_stack_entries( 3 );
 
     // for ( const KISS::CallStackFrame &call_stack_entry: call_stack_entries ) {
@@ -736,33 +444,16 @@ void end_throw_exception_protection()
 
 void stack_trace() {
 
-  // backward::StackTrace st;
+  NSTD::Vector<NSTD::CallStackFrame> call_stack_entries = get_call_stack_entries( 1 );
 
-  // st.load_here();
-
-  // backward::Printer printer;
-
-  // //printer.snippet = false;
-  // printer.address = true;
-  // printer.print( st, std::cout );
-
-  //std::cout.flush();
-
-  //std::cout << get_stack_trace() << std::endl;
-
-  //unwind_print_stack_trace();
-
-  //posix_print_stack_trace();
-  KISS::Vector<KISS::CallStackFrame> *call_stack_entries = get_call_stack_entries( 1 );
-
-  for ( const KISS::CallStackFrame &call_stack_entry: *call_stack_entries ) {
+  for ( const NSTD::CallStackFrame &call_stack_entry: call_stack_entries ) {
 
     std::cout << call_stack_entry.get_function() << " => " << call_stack_entry.get_file() << ":" << call_stack_entry.get_line() << std::endl;
     //std::cout << call_stack_entry << std::endl;
 
   }
 
-  delete call_stack_entries;
+  //delete call_stack_entries;
 
   malloc_trim( 0 );
 
@@ -804,15 +495,15 @@ void valid_function() {
     sync_out << "At: " << exception.at << std::endl;
     sync_out << "StackTrace: " << std::endl;
 
-    if ( exception.call_stack ) {
+    if ( exception.call_stack.size() ) {
 
-      for ( const KISS::CallStackFrame& call_stack_entry: *exception.call_stack ) {
+      for ( const NSTD::CallStackFrame& call_stack_entry: exception.call_stack ) {
 
         sync_out << call_stack_entry.get_function() << " => " << call_stack_entry.get_file() << ":" << call_stack_entry.get_line() << std::endl;
 
       }
 
-      delete exception.call_stack;
+      //delete exception.call_stack;
 
     }
 
@@ -862,15 +553,15 @@ int invalid_memory_access_01()
     sync_out << "At: " << exception.at << std::endl;
     sync_out << "StackTrace: " << std::endl;
 
-    if ( exception.call_stack ) {
+    if ( exception.call_stack.size() ) {
 
-      for ( const KISS::CallStackFrame& call_stack_entry: *exception.call_stack ) {
+      for ( const NSTD::CallStackFrame& call_stack_entry: exception.call_stack ) {
 
         sync_out << call_stack_entry.get_function() << " => " << call_stack_entry.get_file() << ":" << call_stack_entry.get_line() << std::endl;
 
       }
 
-      delete exception.call_stack;
+      //delete exception.call_stack;
 
     }
 
@@ -922,15 +613,15 @@ int invalid_memory_access_02()
     sync_out << "At: " << exception.at << std::endl;
     sync_out << "StackTrace: " << std::endl;
 
-    if ( exception.call_stack ) {
+    if ( exception.call_stack.size() ) {
 
-      for ( const KISS::CallStackFrame& call_stack_entry: *exception.call_stack ) {
+      for ( const NSTD::CallStackFrame& call_stack_entry: exception.call_stack ) {
 
         sync_out << call_stack_entry.get_function() << " => " << call_stack_entry.get_file() << ":" << call_stack_entry.get_line() << std::endl;
 
       }
 
-      delete exception.call_stack;
+      //delete exception.call_stack;
 
     }
 
@@ -975,7 +666,7 @@ int floating_point_exception_01()
     sync_out << "At: " << exception.at << std::endl;
     sync_out << "StackTrace: " << std::endl;
 
-    for ( const KISS::CallStackFrame& call_stack_entry: *exception.call_stack ) {
+    for ( const NSTD::CallStackFrame& call_stack_entry: exception.call_stack ) {
 
       sync_out << call_stack_entry.get_function() << " => " << call_stack_entry.get_file() << ":" << call_stack_entry.get_line() << std::endl;
 
@@ -983,7 +674,7 @@ int floating_point_exception_01()
 
     sync_out << "***** Exception Report End *****" << std::endl;
 
-    delete exception.call_stack;
+    //delete exception.call_stack;
 
   }
 

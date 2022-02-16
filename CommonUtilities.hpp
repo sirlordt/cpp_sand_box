@@ -2,14 +2,29 @@
 
 #include <string>
 #include <thread>
-//#include <iostream>
+#include <iostream>
+#include <sstream>
 #include <syncstream>
 #include <cstring>
+#include <atomic>
+#include <sys/time.h>
 
-#define __INDENT std::string( CommonUtilities::call_left_indent, ' ' )
-#define __INDENT_W_OFFSET( offset ) std::string( CommonUtilities::call_left_indent + 2, ' ' )
-#define __INC_INDENT CommonUtilities::call_left_indent += 2;
-#define __DEC_INDENT CommonUtilities::call_left_indent -= 2;
+//#include "String.hpp"
+
+#define __INDENT CommonUtilities::call_left_indent_buffer
+//NSTD::String( CommonUtilities::call_left_indent, ' ' )
+#define __INC_INDENT __INC_INDENT_W_OFFSET( 2 )
+#define __DEC_INDENT __DEC_INDENT_W_OFFSET( 2 )
+#define __INC_INDENT_W_OFFSET( offset ) \
+   memset( CommonUtilities::call_left_indent_buffer + CommonUtilities::call_left_indent, \
+           ' ', \
+           offset ); \
+   CommonUtilities::call_left_indent += offset;
+#define __DEC_INDENT_W_OFFSET( offset ) \
+   memset( CommonUtilities::call_left_indent_buffer + CommonUtilities::call_left_indent - offset, \
+           0, \
+           CommonUtilities::call_left_indent ); \
+   CommonUtilities::call_left_indent -= offset;
 
 namespace CommonUtilities {
 
@@ -17,12 +32,27 @@ namespace CommonUtilities {
 #define _DATETIME_FORMAT_02 "%Y-%m-%dT%H:%M:%S.%%SSSZ%:z"
 
 std::atomic<uint32_t> call_left_indent = 0;
+static char call_left_indent_buffer[ 150 ] = "";
 
 // inline const  fill_string( int count, char char_fill ) {
 
 //   return std::string( count, char_fill ).c_str();
 
 // }
+
+int init( int argc, char *argv[] ) {
+
+  memset( call_left_indent_buffer, 0, sizeof( call_left_indent_buffer ) );
+
+  return 0;
+
+}
+
+int finish() {
+
+  return 0;
+
+}
 
 const std::string get_thread_id() noexcept
 {

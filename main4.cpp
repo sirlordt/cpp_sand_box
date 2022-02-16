@@ -165,10 +165,10 @@ const CallStackFrame parse_addr2Line_out( std::string addr2line_out,
 
 #define MAX_STACK_FRAMES 64
 
-const KISS::Vector<CallStackFrame> get_call_stack_entries( int stack_offset )
+const NSTD::Vector<CallStackFrame> get_call_stack_entries( int stack_offset )
 {
 
-  KISS::Vector<CallStackFrame> result;
+  NSTD::Vector<CallStackFrame> result;
 
   void *memory_stack_frames[ MAX_STACK_FRAMES ];
 
@@ -360,7 +360,7 @@ void error_handler(int sig)
 
   { //To avoid memory leak, and force to c++ clean before exit the process. checked with valgrind
 
-    const KISS::Vector<CallStackFrame> call_stack_entries = get_call_stack_entries( 3 );
+    const NSTD::Vector<CallStackFrame> call_stack_entries = get_call_stack_entries( 3 );
 
     for ( CallStackFrame call_stack_entry: call_stack_entries ) {
 
