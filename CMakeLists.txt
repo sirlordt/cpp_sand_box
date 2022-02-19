@@ -32,10 +32,21 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG")
 #   String.hpp
 # )
 
+# add_executable(main
+#   main12_CallStackFrameAllocator.cpp
+#   CallStackFrame.hpp
+#   CommonUtilities.hpp
+# )
+
+# add_executable(main
+#   main13_ExceptionAllocator.cpp
+#   CallStackFrame.hpp
+#   Exception.hpp
+#   CommonUtilities.hpp
+# )
+
 add_executable(main
-  main12_Allocator.cpp
-  CallStackFrame.hpp
-  CommonUtilities.hpp
+  main14_type_name_static_string.cpp
 )
 
 #target_link_options(main PRIVATE --static -static-libgcc -static-libstdc++)

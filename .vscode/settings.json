@@ -70,6 +70,9 @@
         "csetjmp": "cpp",
         "csignal": "cpp",
         "syncstream": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "climits": "cpp",
+        "ios": "cpp",
+        "iterator": "cpp"
     }
 }

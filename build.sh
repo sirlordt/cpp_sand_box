@@ -6,6 +6,6 @@ rm -f ./build/debug/main
 
 /usr/bin/cmake --build ./build/debug --config Debug --target main -j 10 --
 
-valgrind ./build/debug/main -s
+valgrind ./build/debug/main
 
-#--leak-check=full
+# -s --leak-check=full

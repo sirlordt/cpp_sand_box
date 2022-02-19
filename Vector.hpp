@@ -36,6 +36,7 @@ namespace NSTD {
     Vector( size_t sz, const T& v );
     Vector( const std::initializer_list<T>& i_list );
     Vector( const Vector& );
+    Vector( const Vector<T>* src );
     Vector( Vector&& );
 
     ~Vector()
@@ -298,7 +299,12 @@ namespace NSTD {
 
     values = new T[v_capacity];
 
-    for( auto iter = i_list.begin(), i = 0; iter != i_list.end(); ++i, ++iter ) {
+    u_int32_t i = 0;
+
+    //std::initializer_list<T>::const_iterator
+    //for( auto iter = i_list.begin(); iter != i_list.end(); ++i, ++iter ) {
+
+    for( const T* iter = i_list.begin(); iter != i_list.end(); ++i, ++iter ) {
 
       values[ i ] = *iter;
 
@@ -331,6 +337,36 @@ namespace NSTD {
     for ( int i = 0; i < v_size; ++i ) {
 
       values[ i ] = src.values[ i ];
+
+    }
+
+    #ifdef __DEBUG_VECTOR__
+
+      __DEBUG_VECTOR_OUT__ << __INDENT << "[->][++constructor++][" << instance_id << "] Vector<T>::Vector( const Vector<T>& src: " << &src << " ) //** Copy const reference **" << std::endl << std::endl;
+
+    #endif
+
+    __DEC_INDENT
+
+  }
+
+  //Copy contructor
+  template<typename T>
+  inline Vector<T>::Vector( const Vector<T>* src ) :
+    v_size(src ? src->v_size: 0),
+    v_capacity(src ? src->v_capacity: 0) //,
+    //values(new T[v_capacity]) //This generate a warning in Valgrind and the compiler (Unizializated value), and create a lot of instances
+  {
+
+    __INC_INDENT
+
+    instance_id = instance_id_count++;
+
+    values = new T[v_capacity];
+
+    for ( int i = 0; i < v_size; ++i ) {
+
+      values[ i ] = src->values[ i ];
 
     }
 

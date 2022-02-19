@@ -16,11 +16,11 @@ namespace NSTD {
   struct CallStackFrame {
   public:
 
-    CallStackFrame() noexcept { // = default;
+    CallStackFrame() { // = default;
 
       __INC_INDENT
 
-      instance_id = instance_id_count++;
+      this->instance_id = instance_id_count++;
 
       #ifdef __DEBUG_CALLSTACKFRAME__
 
@@ -28,7 +28,7 @@ namespace NSTD {
 
       #endif
 
-      this->clear();
+      this->_clear_values();
 
       __DEC_INDENT
 
@@ -50,7 +50,7 @@ namespace NSTD {
 
     }
 
-    CallStackFrame( const char *function, const char *file, const char* line ) {
+    CallStackFrame( const char *function, const char *file, const char* line ): instance_id( 0 ) {
 
       __INC_INDENT
 
@@ -62,7 +62,9 @@ namespace NSTD {
 
       #endif
 
-      this->copy( function, file, line );
+      this->_clear_values();
+
+      this->_copy_values( function, file, line );
 
       #ifdef __DEBUG_CALLSTACKFRAME__
 
@@ -87,9 +89,11 @@ namespace NSTD {
 
       #endif
 
+      this->_clear_values();
+
       if ( copy ) {
 
-        this->copy( copy->function, copy->file, copy->line );
+        this->_copy_values( copy->function, copy->file, copy->line );
 
       }
 
@@ -116,7 +120,9 @@ namespace NSTD {
 
       #endif
 
-      this->copy( copy.function, copy.file, copy.line );
+      this->_clear_values();
+
+      this->_copy_values( copy.function, copy.file, copy.line );
 
       #ifdef __DEBUG_CALLSTACKFRAME__
 
@@ -129,7 +135,7 @@ namespace NSTD {
     }
 
     //Move contructor
-    CallStackFrame( CallStackFrame &&move ) noexcept { // = default;
+    CallStackFrame( CallStackFrame &&move ) { // = default;
 
       __INC_INDENT
 
@@ -141,7 +147,9 @@ namespace NSTD {
 
       #endif
 
-      this->move( move );
+      this->_clear_values();
+
+      this->_move_values( move );
 
       #ifdef __DEBUG_CALLSTACKFRAME__
 
@@ -153,7 +161,7 @@ namespace NSTD {
 
     }
 
-    ~CallStackFrame() noexcept { // = default;
+    ~CallStackFrame() { // = default;
 
       __INC_INDENT
 
@@ -174,11 +182,11 @@ namespace NSTD {
 
       #endif
 
-      this->clear();
+      this->_clear_values();
 
       #ifdef __DEBUG_CALLSTACKFRAME__
 
-        __DEBUG_CALLSTACKFRAME_OUT__ << __INDENT << "[end][~~destructor~~][" << instance_id << "] CallStackFrame::~CallStackFrame() noexcept //** **" << std::endl << std::endl;
+        __DEBUG_CALLSTACKFRAME_OUT__ << __INDENT << "[end][~~destructor~~][" << this->instance_id << "] CallStackFrame::~CallStackFrame() noexcept //** **" << std::endl << std::endl;
 
       #endif
 
@@ -197,7 +205,7 @@ namespace NSTD {
 
       #endif
 
-      this->copy( copy.function, copy.file, copy.line );
+      this->_copy_values( copy.function, copy.file, copy.line );
 
       #ifdef __DEBUG_CALLSTACKFRAME__
 
@@ -224,7 +232,7 @@ namespace NSTD {
       // function = call_stack_entry.function;
       // file = call_stack_entry.file;
       // line = call_stack_entry.line;
-      this->move( move );
+      this->_move_values( move );
 
       #ifdef __DEBUG_CALLSTACKFRAME__
 
@@ -326,10 +334,10 @@ namespace NSTD {
 
   private:
 
-    using AllocatorUInt8 = std::allocator<uint8_t>;
-    using AllocatorUInt8Traits = std::allocator_traits<AllocatorUInt8>; // The matching trait
+    //using AllocatorChar = std::allocator<char>;
+    //using AllocatorCharTraits = std::allocator_traits<AllocatorChar>; // The matching trait
 
-    AllocatorUInt8 allocator {};
+    //AllocatorChar allocatorConstChar {};
 
     inline static uint32_t instance_id_count = 0;
 
@@ -338,115 +346,266 @@ namespace NSTD {
     char *file = nullptr;
     char *line = nullptr;
 
-    inline void clear() {
+    char* buffer = nullptr;
+    uint32_t buffer_total_size = 0;
 
-      if ( function ) {
+    inline void _clear_values() {
 
-        delete []function;
+      //*** The next code is not really needed the char* not had destructor
+      //uint64_t buffer_offset = 0;
+
+      // if ( function ) {
+
+        // const char *temp = ( buffer + buffer_offset );
+
+        // int size = strlen( temp );
+
+        // //std::cout << temp << std::endl;
+
+        // AllocatorCharTraits::destroy( allocatorConstChar, temp );
+
+        // buffer_offset += size + 1;
+
+        // //delete [] function;
+
+      // }
+
+      this->function = nullptr;
+
+      // if ( file ) {
+
+        // const char *temp = ( buffer + buffer_offset );
+
+        // int size = strlen( temp );
+
+        // //std::cout << temp << std::endl;
+
+        // AllocatorCharTraits::destroy( allocatorConstChar, temp );
+
+        // buffer_offset += size + 1;
+
+        // //delete [] file;
+
+      // }
+
+      this->file = nullptr;
+
+      // if ( line ) {
+
+        // const char *temp = ( buffer + buffer_offset );
+
+        // int size = strlen( temp );
+
+        // //std::cout << temp << std::endl;
+
+        // //int size = strlen( ( buffer + buffer_offset ) );
+
+        // AllocatorCharTraits::destroy( allocatorConstChar, temp );
+
+        // buffer_offset += size + 1;
+
+        //delete [] line;
+
+      // }
+
+      this->line = nullptr;
+      //*** The previous code is not really needed the char* not had destructor
+
+      if ( this->buffer ) {
+
+        //Destroy from the heap the linear memory buffer (Delete)
+        //AllocatorCharTraits::deallocate( allocatorConstChar, buffer, buffer_total_size ); //reinterpret_cast<uint8_t *>(
+
+        delete [] this->buffer;
 
       }
 
-      function = nullptr;
+      this->buffer = nullptr;
 
-      if ( file ) {
-
-        delete []file;
-
-      }
-
-      file = nullptr;
-
-      if ( line ) {
-
-        delete []line;
-
-      }
-
-      line = nullptr;
+      this->buffer_total_size = 0;
 
     }
 
-    inline void copy( const char *function, const char *file, const char* line ) {
+    inline void _copy_values( const char *function, const char *file, const char* line ) {
 
       __INC_INDENT
 
       #ifdef __DEBUG_CALLSTACKFRAME__
 
-        __DEBUG_CALLSTACKFRAME_OUT__ << __INDENT << "[begin][==member==][" << instance_id << "] inline void CallStackFrame::copy( const char *function: '" << function << "', const char *file: '" << file << "', const char* line: '" << line << "' ) //** **" << std::endl;
+        __DEBUG_CALLSTACKFRAME_OUT__ << __INDENT << "[begin][==member==][" << instance_id << "] inline void CallStackFrame::_copy_values( const char *function: '" << function << "', const char *file: '" << file << "', const char* line: '" << line << "' ) //** **" << std::endl;
         __DEBUG_CALLSTACKFRAME_OUT__ << __INDENT << std::endl;
 
       #endif
 
-      int size = 0;
+      this->_clear_values();
 
+      uint32_t function_size = 0;
+      uint32_t file_size = 0;
+      uint32_t line_size = 0;
+
+      uint32_t new_buffer_total_size = 0;
+      uint64_t buffer_offset = 0;
+
+      //Get the total of space needed in memory new_buffer_total_size. VERY IMPORTANT!!!
       if ( function ) {
 
-        size = strlen( function );
-
-        if ( size ) {
-
-          this->function = new char[ size + 1 ];
-          strcpy( this->function, function );
-
-        }
-
-        #ifdef __DEBUG_CALLSTACKFRAME__
-
-          __INC_INDENT_W_OFFSET( 2 )
-
-          __DEBUG_CALLSTACKFRAME_OUT__ << __INDENT << "*******************" << std::endl;
-          __DEBUG_CALLSTACKFRAME_OUT__ << __INDENT << "Function size: " << size << std::endl;
-
-        #endif
+        function_size = strlen( function );
+        new_buffer_total_size = function_size + 1;
 
       }
 
-      if ( file ) {
+      if ( file  ) {
 
-        size = strlen( file );
-
-        if ( size ) {
-
-          this->file = new char[ size + 1 ];
-          strcpy( this->file, file );
-
-        }
-
-        #ifdef __DEBUG_CALLSTACKFRAME__
-
-          __DEBUG_CALLSTACKFRAME_OUT__ << __INDENT << "File size: " << size << std::endl;
-
-        #endif
+        file_size = strlen( file );
+        new_buffer_total_size += file_size + 1;
 
       }
 
-      if ( line ) {
+      if ( line  ) {
 
-        size = strlen( line );
-
-        if ( size ) {
-
-          this->line = new char[ size + 1 ];
-          strcpy( this->line, line );
-
-        }
-
-        #ifdef __DEBUG_CALLSTACKFRAME__
-
-          __DEBUG_CALLSTACKFRAME_OUT__ << __INDENT << "Line size: " << size << std::endl;
-          __DEBUG_CALLSTACKFRAME_OUT__ << __INDENT << "*******************" << std::endl;
-
-          __DEC_INDENT_W_OFFSET( 2 )
-
-        #endif
+        line_size = strlen( line );
+        new_buffer_total_size += line_size + 1;
 
       }
+
+      if ( new_buffer_total_size > 0 ) {
+
+
+        //Create in the heap the linear memory buffer (NEW)
+        //buffer = AllocatorCharTraits::allocate( allocatorConstChar, buffer_total_size ); //reinterpret_cast<char *>(
+
+        this->buffer_total_size = new_buffer_total_size;
+        this->buffer = new char[ buffer_total_size ];
+
+        memset( this->buffer, 0, buffer_total_size ); //VERY IMPORTANT!!!. To avoid valgrind complaint avoid "Conditional jump or move depends on uninitialised value(s)"
+
+        buffer_offset = 0;
+
+        // for ( int i = 0; i < buffer_total_size; i++ ) {
+
+        //   buffer[ i ] = 0;
+
+        // }
+
+      }
+
+      if ( function_size > 0 ) {
+
+        //memcpy( buffer, function, function_size );
+
+        //char x = function[ 0 ];
+
+        // for ( int i = 0; i < function_size; i++ ) {
+
+        //   AllocatorCharTraits::construct( allocatorConstChar, buffer + i, function[ i ] );
+
+        // }
+
+        memcpy( buffer, function, function_size );
+
+        //AllocatorConstCharTraits::construct( allocatorConstChar, buffer + strlen( function ), '\0' );
+
+        this->function = (char*) buffer + buffer_offset;
+        buffer_offset += ( function_size + 1 );
+
+        //if ( size ) {
+
+          //this->function = new char[ function_size + 1 ];
+          //strcpy( this->function, function );
+
+        //}
+
+        // #ifdef __DEBUG_CALLSTACKFRAME__
+
+        //   __INC_INDENT_W_OFFSET( 2 )
+
+        //   __DEBUG_CALLSTACKFRAME_OUT__ << __INDENT << "*******************" << std::endl;
+        //   __DEBUG_CALLSTACKFRAME_OUT__ << __INDENT << "Function size: " << size << std::endl;
+
+        // #endif
+
+      }
+
+      if ( file_size ) {
+
+        // for ( int i = 0; i < file_size; i++ ) {
+
+        //   AllocatorCharTraits::construct( allocatorConstChar, buffer + buffer_offset + i, file[ i ] );
+
+        // }
+
+        memcpy( buffer + buffer_offset, file, file_size );
+
+        this->file = (char*) buffer + buffer_offset;
+        buffer_offset += ( file_size + 1 );
+
+        // AllocatorConstCharTraits::construct( allocatorConstChar, &buffer + buffer_offset, (char*) file );
+
+        //if ( size ) {
+
+          //this->file = new char[ file_size + 1 ];
+          //strcpy( this->file, file );
+
+        //}
+
+        // #ifdef __DEBUG_CALLSTACKFRAME__
+
+        //   __DEBUG_CALLSTACKFRAME_OUT__ << __INDENT << "File size: " << size << std::endl;
+
+        // #endif
+
+      }
+
+      if ( line_size > 0 ) {
+
+        // for ( int i = 0; i < line_size; i++ ) {
+
+        //   AllocatorCharTraits::construct( allocatorConstChar, buffer + buffer_offset + i, line[ i ] );
+
+        // }
+
+        memcpy( buffer  + buffer_offset, line, line_size );
+
+        this->line = (char*) buffer + buffer_offset;
+        buffer_offset += ( line_size + 1 );
+
+        //AllocatorConstCharTraits::construct( allocatorConstChar, buffer + buffer_offset, line );
+        // this->line = (char*) *(buffer + buffer_offset);
+        // buffer_offset += ( line_size + 1 );
+
+        //size = strlen( line );
+
+        //if ( size ) {
+
+          //this->line = new char[ line_size + 1 ];
+          //strcpy( this->line, line );
+
+        //}
+
+        // #ifdef __DEBUG_CALLSTACKFRAME__
+
+        //   __DEBUG_CALLSTACKFRAME_OUT__ << __INDENT << "Line size: " << size << std::endl;
+        //   __DEBUG_CALLSTACKFRAME_OUT__ << __INDENT << "*******************" << std::endl;
+
+        //   __DEC_INDENT_W_OFFSET( 2 )
+
+        // #endif
+
+      }
+
+      // for ( int i = 0; i < buffer_total_size; i++ ) {
+
+      //   const char temp = buffer[ i ];
+
+      //   std::cout << temp <<  std::endl;
+
+      // }
 
       #ifdef __DEBUG_CALLSTACKFRAME__
 
         __DEBUG_CALLSTACKFRAME_OUT__ << *this;
 
-        __DEBUG_CALLSTACKFRAME_OUT__ << __INDENT << "[end][==member==][" << instance_id << "] inline void CallStackFrame::copy( const char *function: '" << function << "', const char *file: '" << file << "', const char* line: '" << line << "' ) //** **" << std::endl << std::endl;
+        __DEBUG_CALLSTACKFRAME_OUT__ << __INDENT << "[end][==member==][" << instance_id << "] inline void CallStackFrame::_copy_values( const char *function: '" << function << "', const char *file: '" << file << "', const char* line: '" << line << "' ) //** **" << std::endl << std::endl;
 
       #endif
 
@@ -454,12 +613,14 @@ namespace NSTD {
 
     }
 
-    inline void move( CallStackFrame& move ) {
+    inline void _move_values( CallStackFrame& move ) {
 
       //std::swap( this->instance_id, move.instance_id );
       std::swap( this->function, move.function );
       std::swap( this->file, move.file );
       std::swap( this->line, move.line );
+      std::swap( this->buffer, move.buffer );
+      std::swap( this->buffer_total_size, move.buffer_total_size );
 
     }
 
