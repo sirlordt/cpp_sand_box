@@ -67,7 +67,7 @@ public:
   CONSTEXPR11_TN char operator[]( std::size_t n ) const
   {
 
-    return n < sz_ ? p_[n] : throw std::out_of_range( "static_string" );
+    return n < sz_ ? p_[ n ] : throw std::out_of_range( "static_string" );
 
   }
 
@@ -109,11 +109,7 @@ int& foo_lref() {
 
 }
 
-int&& foo_rref() {
-
-  return 0;
-
-}
+int&& foo_rref();
 
 int foo_value() {
 

@@ -10,12 +10,13 @@
 
 namespace NSTD {
 
-  #define __DEBUG_EXCEPTION__       true
+  //#define __DEBUG_EXCEPTION__       true
   #define __DEBUG_EXCEPTION_OUT__   std::cout
   //#define __DEBUG_CALLSTACKFRAME_LIMIT__ 30
 
   struct Exception
   {
+
     using VectorCallStackFrame = NSTD::Vector<NSTD::CallStackFrame>;
 
     Exception() {
@@ -71,7 +72,7 @@ namespace NSTD {
 
         memset( buffer, 0, 150 );
 
-        sprintf( buffer, "%s%i%s", "[begin][++constructor++][", instance_id, "] Exception::Exception( " );
+        sprintf( buffer, "%s%lu%s", "[begin][++constructor++][", instance_id, "] Exception::Exception( " );
 
         int left_indent = strlen( buffer );
 
@@ -106,7 +107,7 @@ namespace NSTD {
 
         memset( buffer, 0, 150 );
 
-        sprintf( buffer, "%s%i%s", "[end][++constructor++][", instance_id, "] Exception::Exception( " );
+        sprintf( buffer, "%s%lu%s", "[end][++constructor++][", instance_id, "] Exception::Exception( " );
 
         left_indent = strlen( buffer );
 
@@ -334,29 +335,29 @@ namespace NSTD {
 
     }
 
-    std::any operator[]( const char *name ) const {
+    // std::any operator[]( const char *name ) const {
 
-      std::any result;
+    //   std::any result;
 
-      if ( strcmp( name, "thread_id"  ) == 0 ) {
+    //   if ( strcmp( name, "thread_id"  ) == 0 ) {
 
-        result = this->thread_id;
+    //     result = this->thread_id;
 
-      }
-      else if ( strcmp( name, "thread_name" ) == 0 ) {
+    //   }
+    //   else if ( strcmp( name, "thread_name" ) == 0 ) {
 
-        result = this->thread_name;
+    //     result = this->thread_name;
 
-      }
-      else if ( strcmp( name, "signal" ) == 0 ) {
+    //   }
+    //   else if ( strcmp( name, "signal" ) == 0 ) {
 
-        result = this->signal;
+    //     result = this->signal;
 
-      }
+    //   }
 
-      return result;
+    //   return result;
 
-    }
+    // }
 
     // std::any& operator []( const char *name ) {
 
@@ -382,17 +383,78 @@ namespace NSTD {
 
     // }
 
+    const uint64_t get_instance_id() const {
+
+      return instance_id;
+
+    }
+
+    const char *get_thread_id() const {
+
+      return thread_id;
+
+    }
+
+    const char *get_thread_name() const {
+
+      return thread_name;
+
+    }
+
+    const uint16_t get_signal() const {
+
+      return signal;
+
+    }
+
+    const char *get_code() const {
+
+      return code;
+
+    }
+
+    const char *get_message() const {
+
+      return message;
+
+    }
+
+    const char *get_at() const {
+
+      return at;
+
+    }
+
+    const VectorCallStackFrame *get_call_stack() const {
+
+      return call_stack;
+
+    }
+
+    const char *get_buffer() const {
+
+      return buffer;
+
+    }
+
+    const uint32_t get_buffer_total_size() const {
+
+       return buffer_total_size;
+
+    }
+
+    //The friend zone ;-)
     friend std::ostream& operator<<( std::ostream& os, const Exception& exception );
 
   private:
 
-    inline static uint32_t instance_id_count = 0;
+    inline static uint64_t instance_id_count = 0;
 
-    u_int32_t instance_id = 0;
+    u_int64_t instance_id = 0;
 
     char *thread_id = nullptr;
     char *thread_name = nullptr;
-    int signal = -1;
+    uint16_t signal = -1;
     char *code = nullptr;
     char *message = nullptr;
     char *at = nullptr;
@@ -481,7 +543,7 @@ namespace NSTD {
 
         memset( indent_local_buffer, 0, 150 );
 
-        sprintf( indent_local_buffer, "%s%i%s", "[begin][==member==][", instance_id, "] inline void Exception::_copy_values( " );
+        sprintf( indent_local_buffer, "%s%lu%s", "[begin][==member==][", instance_id, "] inline void Exception::_copy_values( " );
 
         int left_indent = strlen( indent_local_buffer );
 
@@ -733,7 +795,7 @@ namespace NSTD {
 
         memset( indent_local_buffer, 0, 150 );
 
-        sprintf( indent_local_buffer, "%s%i%s", "[end][==member==][", instance_id, "] inline void Exception::_copy_values( " );
+        sprintf( indent_local_buffer, "%s%lu%s", "[end][==member==][", instance_id, "] inline void Exception::_copy_values( " );
 
         left_indent = strlen( indent_local_buffer );
 

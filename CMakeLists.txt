@@ -7,13 +7,26 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #Clang++ require the next line to debug std::string
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG")
 
+add_executable(main
+ test01.hpp
+ Vector.hpp
+ Exception.hpp
+ CallStackFrame.hpp
+ CommonConstants.hpp
+ CommonUtilities.hpp
+ SystemConstants.hpp
+ SystemUtilities.hpp
+ main.cpp
+)
+
 # add_executable(main
-#  test01.hpp
-#  Vector.hpp
-#  SystemUtilities.hpp
-#  CallStackFrame.hpp
-#  main.cpp
+#   main16_setjmp.cpp
 # )
+
+# add_executable(main
+#   main15_ucontext.cpp
+# )
+
 
 # add_executable(main
 #   Vector.hpp
@@ -45,9 +58,9 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG")
 #   CommonUtilities.hpp
 # )
 
-add_executable(main
-  main14_type_name_static_string.cpp
-)
+# add_executable(main
+#   main14_type_name_static_string.cpp
+# )
 
 #target_link_options(main PRIVATE --static -static-libgcc -static-libstdc++)
 

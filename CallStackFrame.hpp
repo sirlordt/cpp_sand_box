@@ -9,7 +9,7 @@
 
 namespace NSTD {
 
-  #define __DEBUG_CALLSTACKFRAME__       true
+  //#define __DEBUG_CALLSTACKFRAME__       false
   #define __DEBUG_CALLSTACKFRAME_OUT__   std::cout
   //#define __DEBUG_CALLSTACKFRAME_LIMIT__ 30
 

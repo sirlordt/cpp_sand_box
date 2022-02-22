@@ -22,7 +22,7 @@ int main( int argc, char *argv[] )
 
   #endif
 
-  CommonUtilities::init( argc, argv );
+  CommonUtilities::init( "main_thread", argc, argv );
 
 //   __INC_INDENT
 
@@ -50,7 +50,7 @@ int main( int argc, char *argv[] )
 
 //   __DEBUG_OUT__ << __INDENT << "Test03" << std::endl;
 
-  NSTD::Exception exception { "thread_id", "thread_name", 11, "AAAA", "Test01", "Now" };
+  NSTD::Exception exception { "thread_id", "thread_name", 11, "AAAA", "Test01", "Now", nullptr };
 
   //NSTD::String place_holder { 10, ' ' };
 
@@ -71,7 +71,7 @@ int main( int argc, char *argv[] )
   // __DEBUG_OUT__ << buffer << "Test02" << std::endl;
   //std::any x = exception[ "thread_id" ];
 
-  CommonUtilities::finish();
+  CommonUtilities::finish( "main_thread", argc, argv );
 
   #ifdef __DEBUG__
 

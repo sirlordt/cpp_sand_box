@@ -2,10 +2,10 @@
 
 #/usr/bin/cmake --build /home/dsistemas/Desktop/CPP/projects/sand_box/build/debug --config Debug --target main -j 10 --
 
-rm -f ./build/debug/main
+#rm -f ./build/debug/main
 
-/usr/bin/cmake --build ./build/debug --config Debug --target main -j 10 --
+#/usr/bin/cmake --build ./build/debug --config Debug --target main -j 10 --
 
-valgrind ./build/debug/main
+./build/debug/main
 
 # -s --leak-check=full

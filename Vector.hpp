@@ -8,10 +8,11 @@
 #include <initializer_list>
 #include <math.h>
 
+#include "CommonUtilities.hpp"
 
 namespace NSTD {
 
-  #define __DEBUG_VECTOR__     true
+  //#define __DEBUG_VECTOR__     false
   #define __DEBUG_VECTOR_OUT__ std::cout
 
   template<typename T>
