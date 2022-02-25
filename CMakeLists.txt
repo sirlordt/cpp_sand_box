@@ -8,16 +8,26 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG")
 
 add_executable(main
- test01.hpp
- Vector.hpp
- Exception.hpp
- CallStackFrame.hpp
- CommonConstants.hpp
- CommonUtilities.hpp
- SystemConstants.hpp
- SystemUtilities.hpp
- main.cpp
+   main19_gmtime.cpp
 )
+
+
+# add_executable(main
+#    main18_linkedlist.cpp
+# )
+
+
+# add_executable(main
+#  test01.hpp
+#  Vector.hpp
+#  Exception.hpp
+#  CallStackFrame.hpp
+#  CommonConstants.hpp
+#  CommonUtilities.hpp
+#  SystemConstants.hpp
+#  SystemUtilities.hpp
+#  main.cpp
+# )
 
 # add_executable(main
 #   main16_setjmp.cpp
